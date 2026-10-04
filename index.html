@@ -1,0 +1,448 @@
+<title>Thâm nhập xã hội</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..500&family=Manrope:wght@300..700&display=swap">
+<style>
+/* Layout: a full-screen slide deck. One planet sits behind all slides and glides to a new
+   position, size and tilt on every slide change, which gives the Morph-like continuity. */
+:root {
+  --bg: #07061a;
+  --fg: #efeaff;
+  --muted: #b2abdc;
+  --line: rgba(190, 180, 255, 0.18);
+  --glass: rgba(18, 15, 48, 0.66);
+  --accent: #6ff5e6;
+  --gold: #ffc878;
+  --pink: #ff9ed8;
+  --display: "Fraunces", "Iowan Old Style", Georgia, serif;
+  --body: "Manrope", "Segoe UI", system-ui, sans-serif;
+  color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--body); overflow: hidden; -webkit-font-smoothing: antialiased; }
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+#stars { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.nebula { position: fixed; inset: 0; pointer-events: none;
+  background: radial-gradient(60% 50% at 85% 10%, rgba(120, 90, 255, .28), transparent 70%),
+              radial-gradient(50% 45% at 8% 92%, rgba(40, 200, 190, .16), transparent 70%),
+              radial-gradient(40% 35% at 55% 70%, rgba(255, 120, 170, .08), transparent 70%); }
+
+/* the gliding planet */
+.planet {
+  position: fixed; left: 50%; top: 50%; width: 46vmin; height: 46vmin; margin: -23vmin 0 0 -23vmin;
+  border-radius: 50%; pointer-events: none;
+  transition: transform 1.3s cubic-bezier(.65, 0, .25, 1), filter 1.3s;
+  transform: translate(var(--x, 30vw), var(--y, 0vh)) scale(var(--s, 1)) rotate(var(--r, 0deg));
+  filter: hue-rotate(var(--h, 0deg));
+}
+.planet .globe { position: absolute; inset: 0; border-radius: 50%;
+  background: radial-gradient(circle at 32% 28%, #fff1c2 0%, #ffc878 22%, #ff8a5c 52%, #5a2c4a 86%, #1a0f2e 100%);
+  box-shadow: inset -4vmin -3vmin 9vmin rgba(0,0,0,.6), 0 0 12vmin rgba(255,170,110,.35); }
+.planet .ring { position: absolute; left: -32%; right: -32%; top: 40%; height: 22%; border-radius: 50%;
+  border: 1.6vmin solid rgba(255, 236, 200, .55); transform: rotate(-14deg); }
+.planet .ring.back { clip-path: inset(0 0 50% 0); z-index: 0; }
+.planet .globe { z-index: 1; }
+.planet .ring.front { clip-path: inset(50% 0 0 0); z-index: 2; }
+.moon { position: fixed; left: 50%; top: 50%; width: 7vmin; height: 7vmin; margin: -3.5vmin 0 0 -3.5vmin; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle at 35% 30%, #d7fff9, #2ec4b6 60%, #0e4f56); box-shadow: 0 0 5vmin rgba(111,245,230,.4);
+  transition: transform 1.6s cubic-bezier(.65, 0, .25, 1); transform: translate(var(--mx, -30vw), var(--my, -20vh)); }
+
+/* start screen */
+.start { position: fixed; inset: 0; z-index: 20; display: grid; align-content: center; justify-items: start; gap: 18px;
+  padding: 0 clamp(20px, 8vw, 120px); transition: opacity .8s, visibility .8s; }
+.start.gone { opacity: 0; visibility: hidden; }
+.start h1 { font-family: var(--display); font-weight: 300; font-size: clamp(3rem, 9.5vw, 8rem); line-height: .98; letter-spacing: -.02em; margin: 0; text-wrap: balance; }
+.start h1 em { font-style: italic; background: linear-gradient(90deg, var(--accent), var(--gold) 60%, var(--pink)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.start .sub { font-family: var(--display); font-style: italic; color: var(--gold); font-size: clamp(1.1rem, 2vw, 1.5rem); margin: 0; }
+.start .desc { color: var(--muted); max-width: 46ch; font-size: clamp(1rem, 1.5vw, 1.15rem); line-height: 1.6; margin: 0; }
+.go { display: inline-flex; align-items: center; gap: 12px; margin-top: 10px; padding: 16px 30px; border-radius: 999px; border: 1px solid var(--accent);
+  background: rgba(111, 245, 230, .1); font-weight: 600; letter-spacing: .02em; transition: background .2s, box-shadow .2s; }
+.go:hover { background: rgba(111, 245, 230, .22); box-shadow: 0 0 30px rgba(111, 245, 230, .35); }
+.hint { font-size: 13px; color: var(--muted); }
+kbd { font: inherit; font-size: 12px; padding: 2px 8px; border: 1px solid var(--line); border-radius: 6px; }
+
+/* deck */
+.deck { position: fixed; inset: 0; }
+.slide { position: absolute; inset: 0; padding: clamp(24px, 6vh, 64px) clamp(20px, 7vw, 110px) 96px; overflow-y: auto;
+  display: flex; flex-direction: column; justify-content: center; opacity: 0; visibility: hidden; transform: translateY(24px);
+  transition: opacity .7s, transform .9s cubic-bezier(.2, .7, .2, 1), visibility .7s; }
+.slide.active { opacity: 1; visibility: visible; transform: none; }
+.slide.before { transform: translateY(-24px); }
+.inner { width: min(1080px, 100%); margin-inline: auto; }
+.eyebrow { font-size: 12px; letter-spacing: .24em; text-transform: uppercase; color: var(--accent); font-weight: 600; margin: 0 0 14px; }
+h2 { font-family: var(--display); font-weight: 400; font-size: clamp(2rem, 5vw, 3.8rem); line-height: 1.06; letter-spacing: -.01em; margin: 0; text-wrap: balance; }
+h2 em { font-style: italic; color: var(--pink); }
+/* keep text readable when the planet drifts behind it: dark halo under the text,
+   soft shadow on the glyphs, and a dimmer planet */
+.inner { position: relative; }
+.inner::before { content: ""; position: absolute; inset: -40px -60px; z-index: -1; pointer-events: none;
+  background: radial-gradient(ellipse at 40% 40%, rgba(7, 6, 26, .78) 0%, rgba(7, 6, 26, .5) 55%, transparent 80%); }
+h2, .lede, .eyebrow, blockquote, .note { text-shadow: 0 2px 18px rgba(7, 6, 26, .95), 0 0 3px rgba(7, 6, 26, .8); }
+.planet { opacity: .8; }
+.start h1, .start .desc, .start .sub { text-shadow: 0 2px 20px rgba(7, 6, 26, .95); }
+h3 { font-family: var(--display); font-weight: 400; margin: 0; }
+.lede { color: var(--muted); font-size: clamp(1rem, 1.7vw, 1.25rem); line-height: 1.6; max-width: 60ch; margin: 18px 0 0; }
+.card { background: var(--glass); border: 1px solid var(--line); border-radius: 22px; padding: clamp(18px, 2.4vw, 28px); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+.card p { color: var(--muted); line-height: 1.6; margin: 10px 0 0; font-size: clamp(.95rem, 1.35vw, 1.05rem); }
+.grid { display: grid; gap: 16px; margin-top: clamp(22px, 4vh, 40px); }
+.g2 { grid-template-columns: repeat(2, 1fr); }
+.g3 { grid-template-columns: repeat(3, 1fr); }
+.g4 { grid-template-columns: repeat(4, 1fr); }
+.card h3 { font-size: clamp(1.15rem, 1.9vw, 1.5rem); }
+.big { font-family: var(--display); font-size: clamp(2rem, 4vw, 3.2rem); color: var(--gold); line-height: 1.05; }
+.pink { color: var(--pink); } .teal { color: var(--accent); } .goldc { color: var(--gold); }
+.note { font-family: var(--display); font-style: italic; color: var(--muted); margin-top: 22px; max-width: 70ch; }
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(20px, 4vw, 56px); align-items: center; }
+.half { max-width: 52%; }
+
+/* onion */
+.onion { width: 100%; max-width: 400px; justify-self: center; height: auto; }
+.onion circle { cursor: pointer; transition: opacity .3s, filter .3s; outline: none; }
+.onion circle:hover, .onion circle:focus-visible { filter: brightness(1.2); }
+.onion circle.dim { opacity: .2; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+.chip { padding: 8px 16px; border-radius: 999px; border: 1px solid var(--line); background: transparent; font-size: 14px; }
+.chip[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: transparent; }
+.tag { font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: var(--accent); margin: 0; }
+
+/* dial */
+.dial-track { position: relative; height: 10px; border-radius: 99px; background: linear-gradient(90deg, var(--accent), var(--gold), var(--pink)); margin-top: 18px; }
+.dial-dot { position: absolute; top: 50%; width: 22px; height: 22px; border-radius: 50%; background: var(--fg); transform: translate(-50%, -50%); box-shadow: 0 0 0 6px rgba(255,255,255,.12); transition: left .3s; }
+input[type=range] { width: 100%; margin: 14px 0 0; accent-color: var(--pink); }
+.dial-labels { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); }
+.quote { font-family: var(--display); font-style: italic; font-size: clamp(1.3rem, 2.6vw, 2rem); line-height: 1.3; margin: 18px 0 0; min-height: 2.7em; }
+
+/* stages */
+.stage .dotn { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: var(--accent); color: var(--bg); font-weight: 700; margin-bottom: 14px; }
+.stage:nth-child(2) .dotn { background: var(--gold); } .stage:nth-child(3) .dotn { background: var(--pink); } .stage:nth-child(4) .dotn { background: #b9a8ff; }
+
+/* pros/cons */
+ul.dots { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+ul.dots li { position: relative; padding-left: 22px; color: var(--muted); line-height: 1.55; font-size: clamp(.95rem, 1.35vw, 1.05rem); }
+ul.dots li::before { content: ""; position: absolute; left: 0; top: .6em; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+ul.dots.bad li::before { background: var(--pink); box-shadow: 0 0 10px var(--pink); }
+
+/* closing */
+blockquote { font-family: var(--display); font-weight: 300; font-size: clamp(2rem, 5.4vw, 4.2rem); line-height: 1.12; margin: 0; max-width: 20ch; text-wrap: balance; }
+blockquote em { color: var(--gold); }
+
+/* controls */
+.bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; display: flex; align-items: center; gap: 14px; padding: 14px clamp(16px, 4vw, 40px) calc(14px + env(safe-area-inset-bottom, 0px)); }
+.bar[hidden] { display: none !important; }
+.progress { flex: 1; height: 3px; background: var(--line); border-radius: 9px; overflow: hidden; }
+.progress i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--accent), var(--pink)); transition: width .5s; }
+.count { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; min-width: 4.5em; text-align: center; }
+.nav { width: 46px; height: 46px; border-radius: 50%; border: 1px solid var(--line); background: var(--glass); display: grid; place-items: center; font-size: 18px; transition: border-color .2s, opacity .2s; }
+.nav:hover:not(:disabled) { border-color: var(--accent); }
+.nav:disabled { opacity: .3; cursor: default; }
+.tool { font-size: 13px; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: var(--muted); }
+
+@media (max-width: 860px) {
+  .split, .g2, .g3, .g4 { grid-template-columns: 1fr; }
+  .g4 { grid-template-columns: 1fr 1fr; }
+  .half { max-width: 100%; }
+  .planet { opacity: .55; }
+  .tool { display: none; }
+}
+@media (max-width: 480px) { .g4 { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { .planet, .moon, .slide, .start { transition-duration: .01s; } }
+</style>
+
+<canvas id="stars" aria-hidden="true"></canvas>
+<div class="nebula" aria-hidden="true"></div>
+<div class="moon" id="moon" aria-hidden="true"></div>
+<div class="planet" id="planet" aria-hidden="true"><div class="ring back"></div><div class="globe"></div><div class="ring front"></div></div>
+
+<div class="start" id="start">
+  <p class="eyebrow" style="margin:0">Tâm lý giao tiếp · Thuyết trình</p>
+  <h1>Thâm nhập<br><em>xã hội</em></h1>
+  <p class="sub">Social Penetration Theory</p>
+  <p class="desc">Vì sao có người ta thân ngay từ lần đầu, còn có người bên nhau nhiều năm vẫn xa lạ? Câu trả lời nằm ở cách chúng ta dần kể về bản thân.</p>
+  <button class="go" id="go">Bắt đầu trình chiếu <span aria-hidden="true">→</span></button>
+  <p class="hint">Dùng phím <kbd>←</kbd> <kbd>→</kbd> hoặc vuốt để chuyển slide · <kbd>F</kbd> toàn màn hình</p>
+</div>
+
+<div class="deck" id="deck">
+
+  <section class="slide"><div class="inner">
+    <p class="eyebrow">01 · Định nghĩa</p>
+    <h2>Một lý thuyết về <em>sự gần gũi</em></h2>
+    <p class="lede">Lý thuyết mô tả cách con người từng bước chia sẻ về bản thân, vì sao mức độ chia sẻ ấy làm thay đổi tính chất quan hệ, và các mối quan hệ hình thành, thân mật hơn qua giao tiếp như thế nào.</p>
+    <div class="grid g2">
+      <div class="card"><h3 class="teal">Chia sẻ bao nhiêu</h3><p>Phạm vi các chủ đề hai người sẵn sàng trao đổi.</p></div>
+      <div class="card"><h3 class="pink">Chia sẻ đến mức nào</h3><p>Mức riêng tư của thông tin được trao đổi.</p></div>
+    </div>
+  </div></section>
+
+  <section class="slide"><div class="inner half">
+    <p class="eyebrow">02 · Nguồn gốc</p>
+    <h2>Từ một bài báo đến <em>một cuốn sách</em></h2>
+    <div class="grid">
+      <div class="card"><div class="big">1968</div><p>Dalmas A. Taylor công bố nghiên cứu The Development of Interpersonal Relationships: Social Penetration Processes trên The Journal of Social Psychology.</p></div>
+      <div class="card"><div class="big">1973</div><p>Altman và Taylor xuất bản Social Penetration: The Development of Interpersonal Relationships, hệ thống hóa lý thuyết.</p></div>
+    </div>
+  </div></section>
+
+  <section class="slide"><div class="inner split">
+    <div>
+      <p class="eyebrow">03 · Mô hình củ hành</p>
+      <h2>Tự bộc lộ đi từ <em>ngoài vào trong</em></h2>
+      <div class="card" style="margin-top:22px" aria-live="polite">
+        <p class="tag" id="ltag"></p>
+        <h3 id="ltitle" style="font-size:1.6rem;margin-top:8px"></h3>
+        <p id="ltext"></p>
+        <div class="chips">
+          <button class="chip" data-l="0">Ngoài cùng</button><button class="chip" data-l="1">Giữa</button>
+          <button class="chip" data-l="2">Trong</button><button class="chip" data-l="3">Lõi</button>
+        </div>
+      </div>
+    </div>
+    <svg class="onion" viewBox="0 0 400 400" aria-label="Các lớp của củ hành">
+      <defs>
+        <radialGradient id="g0" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#6A4FD8"/><stop offset=".6" stop-color="#3A2C8C"/><stop offset="1" stop-color="#1B1446"/></radialGradient>
+        <radialGradient id="g1" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#FF9ED8"/><stop offset=".5" stop-color="#B47BFF"/><stop offset="1" stop-color="#5B3FC0"/></radialGradient>
+        <radialGradient id="g2" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#7FF6E4"/><stop offset=".55" stop-color="#2EC4B6"/><stop offset="1" stop-color="#0E6F78"/></radialGradient>
+        <radialGradient id="g3" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#FFF6D6"/><stop offset=".5" stop-color="#FFC36B"/><stop offset="1" stop-color="#FF8A5C"/></radialGradient>
+        <filter id="gl" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+      <circle data-l="0" tabindex="0" role="button" aria-label="Lớp ngoài cùng" cx="200" cy="200" r="184" fill="url(#g0)" stroke="#07061a" stroke-width="2"/>
+      <circle data-l="1" tabindex="0" role="button" aria-label="Lớp giữa" cx="200" cy="200" r="132" fill="url(#g1)" stroke="#07061a" stroke-width="2"/>
+      <circle data-l="2" tabindex="0" role="button" aria-label="Lớp trong" cx="200" cy="200" r="86" fill="url(#g2)" stroke="#07061a" stroke-width="2"/>
+      <circle data-l="3" tabindex="0" role="button" aria-label="Lõi" cx="200" cy="200" r="40" fill="url(#g3)" stroke="#07061a" stroke-width="2" filter="url(#gl)"/>
+    </svg>
+  </div></section>
+
+  <section class="slide"><div class="inner">
+    <p class="eyebrow">04 · Hai chiều kích</p>
+    <h2>Rộng hay <em>sâu</em></h2>
+    <div class="grid g2">
+      <div class="card"><h3 class="teal">Độ rộng · Breadth</h3><p>Số lĩnh vực hai người sẵn sàng trao đổi: công việc, gia đình, du lịch, sở thích, kế hoạch tương lai.</p></div>
+      <div class="card"><h3 class="pink">Độ sâu · Depth</h3><p>Mức riêng tư trong một lĩnh vực. Cùng là chuyện công việc nhưng có thể nói nông hoặc nói sâu.</p></div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <p class="tag" style="color:var(--muted)">Kéo để xem cùng chủ đề “công việc”, từ nông đến sâu</p>
+      <div class="dial-track"><div class="dial-dot" id="dot" style="left:0%"></div></div>
+      <input type="range" id="depth" min="0" max="100" value="0" aria-label="Mức độ sâu">
+      <div class="dial-labels"><span>Nông</span><span>Sâu</span></div>
+      <p class="quote" id="quote"></p>
+    </div>
+  </div></section>
+
+  <section class="slide"><div class="inner">
+    <p class="eyebrow">05 · Tính tương hỗ</p>
+    <h2>Có đi <em>có lại</em></h2>
+    <div class="grid g3">
+      <div class="card"><div class="big">1</div><h3 class="teal">Chia sẻ</h3><p>Một người kể về bản thân ở mức vừa phải, và thường gợi ý người kia kể lại.</p></div>
+      <div class="card"><div class="big">2</div><h3 class="goldc">Đáp lại</h3><p>Người kia chia sẻ tương xứng. Không nhất thiết ngay lập tức hay cùng mức riêng tư.</p></div>
+      <div class="card"><div class="big">3</div><h3 class="pink">Tin tưởng</h3><p>Khi quan hệ ổn định, việc chia sẻ trở nên tự nhiên, ít phụ thuộc vào sự cân bằng từng lần.</p></div>
+    </div>
+    <p class="note">Chia sẻ quá ít khiến người kia thấy xa cách. Chia sẻ quá nhiều, quá sớm khiến họ khó chịu. Nếu chỉ một bên liên tục kể, quan hệ lệch đi.</p>
+  </div></section>
+
+  <section class="slide"><div class="inner">
+    <p class="eyebrow">06 · Các giai đoạn</p>
+    <h2>Quan hệ đi qua <em>bốn giai đoạn</em></h2>
+    <div class="grid g4">
+      <div class="card stage"><div class="dotn">1</div><h3>Định hướng</h3><p>Làm quen qua thông tin công khai, an toàn, mang tính xã giao. Còn thận trọng, hạn chế điều riêng tư.</p></div>
+      <div class="card stage"><div class="dotn">2</div><h3>Thăm dò cảm xúc</h3><p>Phạm vi mở rộng, chia sẻ sở thích, thái độ, quan điểm. Tự nhiên hơn nhưng riêng tư vẫn ít.</p></div>
+      <div class="card stage"><div class="dotn">3</div><h3>Trao đổi cảm xúc</h3><p>Cởi mở chia sẻ cảm xúc và trải nghiệm riêng. Cá tính mỗi người hiện rõ.</p></div>
+      <div class="card stage"><div class="dotn">4</div><h3>Trao đổi ổn định</h3><p>Thấu hiểu và tin tưởng sâu sắc, đoán được phản ứng của nhau, giao tiếp rất tự nhiên.</p></div>
+    </div>
+  </div></section>
+
+  <section class="slide"><div class="inner">
+    <p class="eyebrow">07 · Case 1 · Starbucks</p>
+    <h2>My Starbucks Idea: <em>được lắng nghe</em></h2>
+    <div class="grid g3">
+      <div class="card"><div class="big">2008</div><p>Starbucks mở nền tảng để khách góp ý, bình chọn và thảo luận.</p></div>
+      <div class="card"><div class="big">150.000+</div><p>ý tưởng được gửi đến, tính đến tháng 3/2013.</p></div>
+      <div class="card"><div class="big">277</div><p>cải tiến được triển khai theo công bố của Starbucks.</p></div>
+    </div>
+    <div class="grid g3" style="margin-top:12px">
+      <div class="card"><h3 class="teal">Độ rộng</h3><p>Khách bàn từ sản phẩm sang dịch vụ, tiện ích, trải nghiệm tại cửa hàng.</p></div>
+      <div class="card"><h3 class="pink">Độ sâu</h3><p>Một khách kể 5 năm gắn bó và thất vọng khi máy pha đổi, cappuccino không còn như cũ.</p></div>
+      <div class="card"><h3 class="goldc">Có đi có lại</h3><p>Đề xuất bánh nhỏ góp phần đến Cake Pops. Với ý tưởng chưa làm được, Starbucks giải thích lý do.</p></div>
+    </div>
+  </div></section>
+
+  <section class="slide"><div class="inner">
+    <p class="eyebrow">08 · Case 2 · Dove</p>
+    <h2>Hair Stories: <em>kể chuyện mái tóc</em></h2>
+    <p class="lede">Chiến dịch triển khai ngày 8/3/2021 tại Việt Nam, gắn với Dove Phục Hồi Hư Tổn. Dove nói về con người nhiều hơn là về dầu gội.</p>
+    <div class="grid g3">
+      <div class="card"><h3 class="teal">Tự bộc lộ</h3><p>Từ kiểu tóc, màu tóc đi dần đến tự ti, áp lực xã hội và mong muốn được sống đúng với mình.</p></div>
+      <div class="card"><h3 class="pink">Củ hành</h3><p>Lớp ngoài là ngoại hình, lớp trong là cảm xúc, giá trị và bản sắc cá nhân.</p></div>
+      <div class="card"><h3 class="goldc">Có đi có lại</h3><p>Một người kể, người khác đồng cảm và kể lại trải nghiệm của mình. Giao tiếp không còn một chiều.</p></div>
+    </div>
+    <p class="note">Dove chuyển quan hệ từ “sản phẩm của tôi” sang “không gian để bạn nói về chính bạn”.</p>
+  </div></section>
+
+  <section class="slide"><div class="inner">
+    <p class="eyebrow">09 · Case 3 · Spotify</p>
+    <h2>Wrapped: dữ liệu thành <em>câu chuyện cá nhân</em></h2>
+    <div class="grid g3">
+      <div class="card"><h3 class="teal">Tự bộc lộ thụ động</h3><p>Người dùng không kể chuyện, nhưng thói quen nghe nhạc bộc lộ nội tâm. Spotify quan sát và thấu hiểu.</p></div>
+      <div class="card"><h3 class="pink">Chi phí</h3><p>Chia sẻ nghĩa là để lộ một phần riêng tư và những thói quen ngầm của bản thân.</p></div>
+      <div class="card"><h3 class="goldc">Phần thưởng</h3><p>Được công nhận, thể hiện cá tính, thuộc về cộng đồng, ví dụ nằm trong top 1% người nghe một nghệ sĩ.</p></div>
+    </div>
+    <p class="note">Người dùng chia sẻ khi thấy phần thưởng lớn hơn chi phí. Audio Aura phân tích tâm trạng, đi vào lớp sâu hơn của người nghe.</p>
+  </div></section>
+
+  <section class="slide"><div class="inner">
+    <p class="eyebrow">10 · Ưu điểm</p>
+    <h2>Vì sao lý thuyết này <em>vẫn được dùng</em></h2>
+    <div class="grid g2">
+      <div class="card"><ul class="dots">
+        <li>Biến sự thân mật thành cấu trúc: rộng, sâu, riêng tư, có đáp lại hay không.</li>
+        <li>Đặt chất lượng tự bộc lộ làm trung tâm, không chỉ thời gian quen biết.</li>
+        <li>Giải thích tính có đi có lại: quá ít, quá nhiều hay một chiều đều làm quan hệ lệch.</li>
+      </ul></div>
+      <div class="card"><ul class="dots">
+        <li>Kết hợp chi phí và phần thưởng: vì sao ta kể khác nhau với bạn thân, cha mẹ, đồng nghiệp.</li>
+        <li>Giải thích cả sự suy giảm quan hệ (depenetration).</li>
+        <li>Dùng được ở bạn bè, gia đình, lớp học, tư vấn, chăm sóc khách hàng, mạng xã hội.</li>
+      </ul></div>
+    </div>
+  </div></section>
+
+  <section class="slide"><div class="inner">
+    <p class="eyebrow">11 · Hạn chế</p>
+    <h2>Những chỗ lý thuyết <em>chưa nói hết</em></h2>
+    <div class="grid g2">
+      <div class="card"><ul class="dots bad">
+        <li>Giả định tuyến tính, trong khi quan hệ thực tế dao động, khép rồi mở.</li>
+        <li>Sâu không đồng nghĩa thân: có thể kể sâu vì khủng hoảng, gây ấn tượng hay kiểm soát người nghe.</li>
+        <li>Ít xét nội dung và động cơ: thật hay bóp méo, tự nguyện hay bị ép.</li>
+      </ul></div>
+      <div class="card"><ul class="dots bad">
+        <li>Khác biệt văn hóa: ở nhiều cộng đồng, giữ kín là tôn trọng.</li>
+        <li>Đánh giá con người quá lý trí, bỏ qua cảm xúc tức thời và thiết kế nền tảng.</li>
+        <li>Quyền lực bất cân xứng: người dùng với thuật toán, nhân viên với quản lý.</li>
+      </ul></div>
+    </div>
+  </div></section>
+
+  <section class="slide"><div class="inner">
+    <p class="eyebrow">12 · Hướng mở rộng</p>
+    <h2>Đưa lý thuyết vào <em>thời đại số</em></h2>
+    <div class="grid g2">
+      <div class="card"><h3 class="teal">Mô hình linh hoạt</h3><p>Xem xâm nhập xã hội là quá trình động, phi tuyến, luôn điều chỉnh.</p></div>
+      <div class="card"><h3 class="goldc">Chất lượng tự bộc lộ</h3><p>Xét thêm tính chân thực, mục đích, thời điểm và phản ứng của người nghe.</p></div>
+      <div class="card"><h3 class="pink">Kết hợp lý thuyết khác</h3><p>Quản trị quyền riêng tư và Biện chứng quan hệ: mở và khép, gắn kết và tự chủ.</p></div>
+      <div class="card"><h3 class="teal">Truyền thông số</h3><p>Tự trình hiện có chọn lọc, lý tưởng hóa đối phương, ranh giới giữa các nhóm công chúng bị xóa nhòa.</p></div>
+    </div>
+  </div></section>
+
+  <section class="slide"><div class="inner">
+    <p class="eyebrow">Kết luận</p>
+    <blockquote>Không chỉ là kể sâu đến đâu, mà là kể <em>gì</em>, với <em>ai</em>, <em>khi nào</em>.</blockquote>
+    <p class="lede">Và thông tin ấy được quản lý ra sao sau khi đã chia sẻ.</p>
+    <p class="note" style="color:var(--gold)">Cảm ơn mọi người đã lắng nghe.</p>
+  </div></section>
+</div>
+
+<div class="bar" id="bar" hidden>
+  <button class="nav" id="prev" aria-label="Slide trước">←</button>
+  <div class="progress"><i id="prog"></i></div>
+  <span class="count" id="count"></span>
+  <button class="tool" id="fs">Toàn màn hình</button>
+  <button class="tool" id="home">Về đầu</button>
+  <button class="nav" id="next" aria-label="Slide sau">→</button>
+</div>
+
+<script>
+(function () {
+  // starfield
+  var c = document.getElementById("stars"), x = c.getContext("2d"), stars = [], W, H, dpr = devicePixelRatio || 1;
+  function size() { W = c.width = innerWidth * dpr; H = c.height = innerHeight * dpr; stars = [];
+    for (var i = 0, n = Math.round(innerWidth * innerHeight / 3500); i < n; i++) stars.push({ x: Math.random() * W, y: Math.random() * H, r: (Math.random() * 1.3 + .2) * dpr, s: Math.random() * .4 + .05, a: Math.random() * 6 }); }
+  function draw() { x.clearRect(0, 0, W, H);
+    for (var i = 0; i < stars.length; i++) { var s = stars[i]; s.a += .012; s.y += s.s * dpr * .12; if (s.y > H) s.y = 0;
+      x.fillStyle = "rgba(240,236,255," + (.35 + .5 * Math.abs(Math.sin(s.a))) + ")"; x.beginPath(); x.arc(s.x, s.y, s.r, 0, 6.283); x.fill(); }
+    if (!matchMedia("(prefers-reduced-motion: reduce)").matches) requestAnimationFrame(draw); }
+  size(); draw(); addEventListener("resize", size);
+
+  // planet pose per slide: x(vw), y(vh), scale, rotation, hue, moon x, moon y
+  var POSE = [
+    [34, 2, 1.0, -10, 0, -24, -22],  [38, 6, .8, 8, 40, 30, 24],     [-40, 4, 1.15, -18, 160, 36, -26],
+    [40, -8, .7, 12, 250, -34, 24],  [36, 10, 1.3, -6, 320, 30, -28],  [-38, -10, .75, 16, 90, 36, 22],
+    [40, 8, .8, -14, 200, -30, 26],  [38, -6, 1.1, 10, 300, 32, -22],  [-36, 6, .9, -10, 20, -28, 26],
+    [40, 4, .7, 18, 120, 34, -26],   [-40, -6, .85, -16, 210, 30, 26], [38, 8, 1.0, 6, 340, -32, -24],
+    [0, 0, 1.6, 0, 0, 30, -26]
+  ];
+  var planet = document.getElementById("planet"), moon = document.getElementById("moon");
+  function pose(i) { var p = POSE[Math.min(i, POSE.length - 1)], narrow = innerWidth < 860;
+    planet.style.setProperty("--x", (narrow ? p[0] * .4 : p[0]) + "vw"); planet.style.setProperty("--y", (narrow ? -22 : p[1]) + "vh");
+    planet.style.setProperty("--s", narrow ? p[2] * .6 : p[2]); planet.style.setProperty("--r", p[3] + "deg"); planet.style.setProperty("--h", p[4] + "deg");
+    moon.style.setProperty("--mx", p[5] + "vw"); moon.style.setProperty("--my", p[6] + "vh"); }
+
+  // deck
+  var slides = [].slice.call(document.querySelectorAll(".slide")), cur = 0, started = false;
+  var start = document.getElementById("start"), bar = document.getElementById("bar"),
+      prev = document.getElementById("prev"), next = document.getElementById("next");
+  function show(i) {
+    cur = Math.max(0, Math.min(slides.length - 1, i));
+    slides.forEach(function (s, k) { s.classList.toggle("active", k === cur); s.classList.toggle("before", k < cur); });
+    document.getElementById("count").textContent = (cur + 1) + " / " + slides.length;
+    document.getElementById("prog").style.width = ((cur + 1) / slides.length * 100) + "%";
+    prev.disabled = cur === 0; next.disabled = cur === slides.length - 1;
+    slides[cur].scrollTop = 0; pose(cur);
+    try { history.replaceState(null, "", "#" + (cur + 1)); } catch (e) {}
+  }
+  function begin() { started = true; start.classList.add("gone"); bar.hidden = false; show(0); }
+  function home() { started = false; start.classList.remove("gone"); bar.hidden = true;
+    slides.forEach(function (s) { s.classList.remove("active", "before"); }); pose(0); }
+  pose(0);
+  document.getElementById("go").addEventListener("click", begin);
+  prev.addEventListener("click", function () { show(cur - 1); });
+  next.addEventListener("click", function () { show(cur + 1); });
+  document.getElementById("home").addEventListener("click", home);
+  document.getElementById("fs").addEventListener("click", function () {
+    try { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen().catch(function () {}); } catch (e) {} });
+  addEventListener("keydown", function (e) {
+    if (e.target && /INPUT|TEXTAREA/.test(e.target.tagName) && /Arrow(Left|Right)/.test(e.key) === false) return;
+    if (!started) { if (e.key === "Enter" || e.key === " " || e.key === "ArrowRight") { e.preventDefault(); begin(); } return; }
+    if (e.target && e.target.tagName === "INPUT") return;
+    if (e.key === "ArrowRight" || e.key === "PageDown" || (e.key === " " && !(e.target && e.target.tagName === "BUTTON"))) { e.preventDefault(); show(cur + 1); }
+    else if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); show(cur - 1); }
+    else if (e.key === "Home") show(0); else if (e.key === "End") show(slides.length - 1);
+    else if (e.key === "Escape") home();
+    else if (e.key === "f" || e.key === "F") document.getElementById("fs").click();
+  });
+  var tx = null;
+  addEventListener("touchstart", function (e) { tx = e.touches[0].clientX; }, { passive: true });
+  addEventListener("touchend", function (e) { if (tx === null || !started) return; var d = e.changedTouches[0].clientX - tx;
+    if (Math.abs(d) > 60) show(cur + (d < 0 ? 1 : -1)); tx = null; }, { passive: true });
+
+  // onion slide
+  var L = [
+    ["Lớp 1 · Ngoài cùng", "Những điều ai cũng có thể nói", "Tên, nghề nghiệp, trường học, quê quán, sở thích phổ biến và các chủ đề sẵn sàng trao đổi với nhiều người."],
+    ["Lớp 2 · Giữa", "Những điều đã định hình mình", "Quan điểm cá nhân, thái độ với vấn đề xã hội, mục tiêu nghề nghiệp và những trải nghiệm quan trọng."],
+    ["Lớp 3 · Trong", "Những điều chỉ kể với rất ít người", "Giá trị cốt lõi, nỗi sợ, tổn thương, niềm tin sâu sắc và những vấn đề riêng tư."],
+    ["Lõi", "Phần sâu nhất của bản thân", "Chỉ được chia sẻ trong những quan hệ thân thiết nhất, khi người nghe đã đáp lại bằng sự tin cậy."]
+  ];
+  var circles = document.querySelectorAll(".onion circle"), chips = document.querySelectorAll(".chip");
+  function pick(i) {
+    document.getElementById("ltag").textContent = L[i][0]; document.getElementById("ltitle").textContent = L[i][1]; document.getElementById("ltext").textContent = L[i][2];
+    circles.forEach(function (k) { k.classList.toggle("dim", +k.dataset.l !== i); });
+    chips.forEach(function (k) { k.setAttribute("aria-pressed", String(+k.dataset.l === i)); });
+  }
+  circles.forEach(function (k) { k.addEventListener("click", function () { pick(+k.dataset.l); });
+    k.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); e.stopPropagation(); pick(+k.dataset.l); } }); });
+  chips.forEach(function (k) { k.addEventListener("click", function () { pick(+k.dataset.l); }); });
+  pick(0);
+
+  // depth dial
+  var Dq = ["“Mình làm trong ngành truyền thông.”", "“Mình làm việc khá vất vả, cũng hơi mệt.”", "“Mình không chắc còn muốn làm nghề này lâu dài.”"];
+  var dr = document.getElementById("depth");
+  function dial() { var v = +dr.value; document.getElementById("dot").style.left = v + "%"; document.getElementById("quote").textContent = Dq[v < 34 ? 0 : v < 67 ? 1 : 2]; }
+  dr.addEventListener("input", dial); dial();
+
+  // open at a hash slide if present
+  var h = parseInt((location.hash || "").slice(1), 10);
+  if (h > 0 && h <= slides.length) { begin(); show(h - 1); }
+})();
+</script>
