@@ -107,7 +107,10 @@ h3 { font-family: var(--display); font-weight: 400; margin: 0; }
 .onion { width: 100%; max-width: 400px; justify-self: center; height: auto; }
 .onion circle { cursor: pointer; transition: opacity .3s, filter .3s; outline: none; }
 .onion circle:hover, .onion circle:focus-visible { filter: brightness(1.2); }
-.onion circle.dim { opacity: .2; }
+.onion circle.dim { opacity: .22; }
+.onion circle.sel { filter: url(#gl); }
+.onion .spin { transform-box: fill-box; transform-origin: center; animation: orb 60s linear infinite; }
+@keyframes orb { to { transform: rotate(360deg); } }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
 .chip { padding: 8px 16px; border-radius: 999px; border: 1px solid var(--line); background: transparent; font-size: 14px; }
 .chip[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: transparent; }
@@ -207,18 +210,32 @@ blockquote em { color: var(--gold); }
         </div>
       </div>
     </div>
-    <svg class="onion" viewBox="0 0 400 400" aria-label="Các lớp của củ hành">
+    <svg class="onion" viewBox="0 0 440 440" aria-label="Các lớp của củ hành">
       <defs>
-        <radialGradient id="g0" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#6A4FD8"/><stop offset=".6" stop-color="#3A2C8C"/><stop offset="1" stop-color="#1B1446"/></radialGradient>
-        <radialGradient id="g1" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#FF9ED8"/><stop offset=".5" stop-color="#B47BFF"/><stop offset="1" stop-color="#5B3FC0"/></radialGradient>
-        <radialGradient id="g2" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#7FF6E4"/><stop offset=".55" stop-color="#2EC4B6"/><stop offset="1" stop-color="#0E6F78"/></radialGradient>
-        <radialGradient id="g3" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#FFF6D6"/><stop offset=".5" stop-color="#FFC36B"/><stop offset="1" stop-color="#FF8A5C"/></radialGradient>
-        <filter id="gl" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        <radialGradient id="g0" cx="35%" cy="28%" r="80%"><stop offset="0" stop-color="#8E7BFF"/><stop offset=".45" stop-color="#4B38B8"/><stop offset="1" stop-color="#150F3E"/></radialGradient>
+        <radialGradient id="g1" cx="35%" cy="28%" r="80%"><stop offset="0" stop-color="#FFB6E6"/><stop offset=".45" stop-color="#B160F0"/><stop offset="1" stop-color="#4A2A9E"/></radialGradient>
+        <radialGradient id="g2" cx="35%" cy="28%" r="80%"><stop offset="0" stop-color="#B4FFF2"/><stop offset=".45" stop-color="#26BFB0"/><stop offset="1" stop-color="#0A5560"/></radialGradient>
+        <radialGradient id="g3" cx="35%" cy="28%" r="80%"><stop offset="0" stop-color="#FFFBE6"/><stop offset=".4" stop-color="#FFC96B"/><stop offset="1" stop-color="#FF7A50"/></radialGradient>
+        <radialGradient id="shine" cx="30%" cy="22%" r="55%"><stop offset="0" stop-color="#fff" stop-opacity=".5"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+        <linearGradient id="rim" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".7"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#fff" stop-opacity=".25"/></linearGradient>
+        <filter id="gl" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="9" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
       </defs>
-      <circle data-l="0" tabindex="0" role="button" aria-label="Lớp ngoài cùng" cx="200" cy="200" r="184" fill="url(#g0)" stroke="#07061a" stroke-width="2"/>
-      <circle data-l="1" tabindex="0" role="button" aria-label="Lớp giữa" cx="200" cy="200" r="132" fill="url(#g1)" stroke="#07061a" stroke-width="2"/>
-      <circle data-l="2" tabindex="0" role="button" aria-label="Lớp trong" cx="200" cy="200" r="86" fill="url(#g2)" stroke="#07061a" stroke-width="2"/>
-      <circle data-l="3" tabindex="0" role="button" aria-label="Lõi" cx="200" cy="200" r="40" fill="url(#g3)" stroke="#07061a" stroke-width="2" filter="url(#gl)"/>
+      <g class="spin" aria-hidden="true">
+        <circle cx="220" cy="220" r="214" fill="none" stroke="#9c8cff" stroke-opacity=".35" stroke-dasharray="2 9" stroke-linecap="round" style="pointer-events:none"/>
+        <circle cx="220" cy="6" r="4" fill="#6ff5e6" style="pointer-events:none"/><circle cx="434" cy="220" r="3" fill="#ff9ed8" style="pointer-events:none"/><circle cx="60" cy="372" r="3" fill="#ffc878" style="pointer-events:none"/>
+      </g>
+      <circle data-l="0" tabindex="0" role="button" aria-label="Lớp ngoài cùng" cx="220" cy="220" r="190" fill="url(#g0)"/>
+      <circle data-l="1" tabindex="0" role="button" aria-label="Lớp giữa" cx="220" cy="220" r="138" fill="url(#g1)"/>
+      <circle data-l="2" tabindex="0" role="button" aria-label="Lớp trong" cx="220" cy="220" r="90" fill="url(#g2)"/>
+      <circle data-l="3" tabindex="0" role="button" aria-label="Lõi" cx="220" cy="220" r="44" fill="url(#g3)"/>
+      <g aria-hidden="true" style="pointer-events:none" fill="none">
+        <circle cx="220" cy="220" r="190" stroke="url(#rim)" stroke-width="2"/><circle cx="220" cy="220" r="138" stroke="url(#rim)" stroke-width="2"/>
+        <circle cx="220" cy="220" r="90" stroke="url(#rim)" stroke-width="2"/><circle cx="220" cy="220" r="44" stroke="url(#rim)" stroke-width="2"/>
+        <circle cx="220" cy="220" r="190" fill="url(#shine)" stroke="none"/><circle cx="220" cy="220" r="138" fill="url(#shine)" stroke="none" opacity=".6"/>
+      </g>
+      <g aria-hidden="true" style="pointer-events:none" fill="#fff" fill-opacity=".85" font-size="11" font-weight="600" letter-spacing="2.4" text-anchor="middle" font-family="Manrope, sans-serif">
+        <text x="220" y="62">NGOÀI CÙNG</text><text x="220" y="112">GIỮA</text><text x="220" y="156">TRONG</text><text x="220" y="224" font-size="10" fill="#4a1d00" fill-opacity=".8">LÕI</text>
+      </g>
     </svg>
   </div></section>
 
@@ -387,25 +404,34 @@ blockquote em { color: var(--gold); }
     moon.style.setProperty("--mx", p[5] + "vw"); moon.style.setProperty("--my", p[6] + "vh"); }
 
   // deck
-  var slides = [].slice.call(document.querySelectorAll(".slide")), cur = 0, started = false;
+  var slides = [].slice.call(document.querySelectorAll(".slide")), cur = 0, sub = 0, started = false;
+  var STEPS = { 2: 4 }; // slide index 2 (onion) has 4 inner steps: one per layer
   var start = document.getElementById("start"), bar = document.getElementById("bar"),
       prev = document.getElementById("prev"), next = document.getElementById("next");
-  function show(i) {
-    cur = Math.max(0, Math.min(slides.length - 1, i));
+  function show(i, s2) {
+    cur = Math.max(0, Math.min(slides.length - 1, i)); sub = s2 || 0;
+    if (cur === 2 && window.pickLayer) window.pickLayer(sub);
     slides.forEach(function (s, k) { s.classList.toggle("active", k === cur); s.classList.toggle("before", k < cur); });
     document.getElementById("count").textContent = (cur + 1) + " / " + slides.length;
     document.getElementById("prog").style.width = ((cur + 1) / slides.length * 100) + "%";
-    prev.disabled = cur === 0; next.disabled = cur === slides.length - 1;
+    prev.disabled = cur === 0 && sub === 0; next.disabled = cur === slides.length - 1;
     slides[cur].scrollTop = 0; pose(cur);
     try { history.replaceState(null, "", "#" + (cur + 1)); } catch (e) {}
+  }
+  function step(d) {
+    var n = STEPS[cur] || 1;
+    if (d > 0 && sub < n - 1) { sub++; if (cur === 2) window.pickLayer(sub); prev.disabled = false; return; }
+    if (d < 0 && sub > 0) { sub--; if (cur === 2) window.pickLayer(sub); return; }
+    var t = cur + d; if (t < 0 || t >= slides.length) return;
+    show(t, d < 0 ? (STEPS[t] || 1) - 1 : 0);
   }
   function begin() { started = true; start.classList.add("gone"); bar.hidden = false; show(0); }
   function home() { started = false; start.classList.remove("gone"); bar.hidden = true;
     slides.forEach(function (s) { s.classList.remove("active", "before"); }); pose(0); }
   pose(0);
   document.getElementById("go").addEventListener("click", begin);
-  prev.addEventListener("click", function () { show(cur - 1); });
-  next.addEventListener("click", function () { show(cur + 1); });
+  prev.addEventListener("click", function () { step(-1); });
+  next.addEventListener("click", function () { step(1); });
   document.getElementById("home").addEventListener("click", home);
   document.getElementById("fs").addEventListener("click", function () {
     try { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen().catch(function () {}); } catch (e) {} });
@@ -413,8 +439,8 @@ blockquote em { color: var(--gold); }
     if (e.target && /INPUT|TEXTAREA/.test(e.target.tagName) && /Arrow(Left|Right)/.test(e.key) === false) return;
     if (!started) { if (e.key === "Enter" || e.key === " " || e.key === "ArrowRight") { e.preventDefault(); begin(); } return; }
     if (e.target && e.target.tagName === "INPUT") return;
-    if (e.key === "ArrowRight" || e.key === "PageDown" || (e.key === " " && !(e.target && e.target.tagName === "BUTTON"))) { e.preventDefault(); show(cur + 1); }
-    else if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); show(cur - 1); }
+    if (e.key === "ArrowRight" || e.key === "PageDown" || (e.key === " " && !(e.target && e.target.tagName === "BUTTON"))) { e.preventDefault(); step(1); }
+    else if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); step(-1); }
     else if (e.key === "Home") show(0); else if (e.key === "End") show(slides.length - 1);
     else if (e.key === "Escape") home();
     else if (e.key === "f" || e.key === "F") document.getElementById("fs").click();
@@ -422,7 +448,7 @@ blockquote em { color: var(--gold); }
   var tx = null;
   addEventListener("touchstart", function (e) { tx = e.touches[0].clientX; }, { passive: true });
   addEventListener("touchend", function (e) { if (tx === null || !started) return; var d = e.changedTouches[0].clientX - tx;
-    if (Math.abs(d) > 60) show(cur + (d < 0 ? 1 : -1)); tx = null; }, { passive: true });
+    if (Math.abs(d) > 60) step(d < 0 ? 1 : -1); tx = null; }, { passive: true });
 
   // onion slide
   var L = [
@@ -434,13 +460,13 @@ blockquote em { color: var(--gold); }
   var circles = document.querySelectorAll(".onion circle"), chips = document.querySelectorAll(".chip");
   function pick(i) {
     document.getElementById("ltag").textContent = L[i][0]; document.getElementById("ltitle").textContent = L[i][1]; document.getElementById("ltext").textContent = L[i][2];
-    circles.forEach(function (k) { k.classList.toggle("dim", +k.dataset.l !== i); });
+    circles.forEach(function (k) { k.classList.toggle("dim", +k.dataset.l !== i); k.classList.toggle("sel", +k.dataset.l === i); });
     chips.forEach(function (k) { k.setAttribute("aria-pressed", String(+k.dataset.l === i)); });
   }
   circles.forEach(function (k) { k.addEventListener("click", function () { pick(+k.dataset.l); });
     k.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); e.stopPropagation(); pick(+k.dataset.l); } }); });
   chips.forEach(function (k) { k.addEventListener("click", function () { pick(+k.dataset.l); }); });
-  pick(0);
+  window.pickLayer = pick; pick(0);
 
   // depth dial
   var Dq = ["“Mình làm trong ngành truyền thông.”", "“Mình làm việc khá vất vả, cũng hơi mệt.”", "“Mình không chắc còn muốn làm nghề này lâu dài.”"];
