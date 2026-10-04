@@ -65,6 +65,9 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .start .desc { color: var(--muted); max-width: 46ch; font-size: clamp(1rem, 1.5vw, 1.15rem); line-height: 1.6; margin: 0; }
 .go { display: inline-flex; align-items: center; gap: 12px; margin-top: 10px; padding: 16px 30px; border-radius: 999px; border: 1px solid var(--accent);
   background: rgba(111, 245, 230, .1); font-weight: 600; letter-spacing: .02em; transition: background .2s, box-shadow .2s; }
+.actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.go.alt { border-color: var(--line); background: rgba(255,255,255,.05); }
+.go.alt:hover { border-color: var(--pink); background: rgba(255,158,216,.14); box-shadow: 0 0 30px rgba(255,158,216,.25); }
 .go:hover { background: rgba(111, 245, 230, .22); box-shadow: 0 0 30px rgba(111, 245, 230, .35); }
 .hint { font-size: 13px; color: var(--muted); }
 kbd { font: inherit; font-size: 12px; padding: 2px 8px; border: 1px solid var(--line); border-radius: 6px; }
@@ -187,7 +190,8 @@ blockquote em { color: var(--gold); }
   <h1>Thâm nhập<br><em>xã hội</em></h1>
   <p class="sub">Social Penetration Theory</p>
   <p class="desc">Vì sao có người ta thân ngay từ lần đầu, còn có người bên nhau nhiều năm vẫn xa lạ? Câu trả lời nằm ở cách chúng ta dần kể về bản thân.</p>
-  <button class="go" id="go">Bắt đầu trình chiếu <span aria-hidden="true">→</span></button>
+  <div class="actions"><button class="go" id="go">Bắt đầu trình chiếu <span aria-hidden="true">→</span></button>
+  <button class="go alt" id="fs0">Toàn màn hình</button></div>
   <p class="hint">Dùng phím <kbd>←</kbd> <kbd>→</kbd> hoặc vuốt để chuyển slide · <kbd>F</kbd> toàn màn hình</p>
 </div>
 
@@ -461,8 +465,10 @@ blockquote em { color: var(--gold); }
   prev.addEventListener("click", function () { step(-1); });
   next.addEventListener("click", function () { step(1); });
   document.getElementById("home").addEventListener("click", home);
-  document.getElementById("fs").addEventListener("click", function () {
-    try { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen().catch(function () {}); } catch (e) {} });
+  function toggleFs() {
+    try { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen().catch(function () {}); } catch (e) {} }
+  document.getElementById("fs").addEventListener("click", toggleFs);
+  document.getElementById("fs0").addEventListener("click", toggleFs);
   addEventListener("keydown", function (e) {
     if (e.target && /INPUT|TEXTAREA/.test(e.target.tagName) && /Arrow(Left|Right)/.test(e.key) === false) return;
     if (!started) { if (e.key === "Enter" || e.key === " " || e.key === "ArrowRight") { e.preventDefault(); begin(); } return; }
